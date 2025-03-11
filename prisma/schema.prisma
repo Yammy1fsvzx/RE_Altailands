@@ -1,0 +1,284 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  comments      Comment[]
+}
+
+model Contact {
+  id            String    @id @default(cuid())
+  phone         String
+  email         String
+  address       String
+  workingHours  WorkingHours[]
+  socialMedia   SocialMedia?
+  updatedAt     DateTime  @updatedAt
+}
+
+model WorkingHours {
+  id          String    @id @default(cuid())
+  dayOfWeek   DayOfWeek
+  openTime    String    // В формате "HH:mm"
+  closeTime   String    // В формате "HH:mm"
+  isWorkingDay Boolean  @default(true)
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId   String
+}
+
+model SocialMedia {
+  id          String    @id @default(cuid())
+  whatsapp    String?
+  telegram    String?
+  instagram   String?
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId   String    @unique
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum PlotStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+model Plot {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String       @unique
+  description     String       // Большой текст
+  area            Float        // Площадь в м²
+  price           Float        // Цена в рублях
+  pricePerMeter   Float       // Автоматически вычисляемая цена за м²
+  region          String       // Регион
+  locality        String       // Населенный пункт
+  landUseType     String       // ВРИ
+  landCategory    String       // Категория земель
+  status          PlotStatus   @default(AVAILABLE)
+  isVisible       Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  // Связи с дополнительными данными
+  media           PlotMedia[]      // Медиафайлы
+  documents       PlotDocument[]   // Документы
+  cadastralNumbers PlotCadastral[] // Кадастровые номера
+  communications  PlotCommunication[] // Коммуникации
+  features        PlotFeature[]    // Особенности
+  applications    Application[]
+}
+
+model PlotMedia {
+  id        String   @id @default(cuid())
+  name      String   // Название файла
+  url       String   // URL файла
+  order     Int      // Порядковый номер для сортировки
+  type      String   // Тип медиа (image/video)
+  plot      Plot     @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plotId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([plotId])
+  @@index([order])
+}
+
+model PlotDocument {
+  id        String   @id @default(cuid())
+  name      String   // Название документа
+  title     String   // Заголовок документа
+  url       String   // URL документа
+  plot      Plot     @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plotId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([plotId])
+}
+
+model PlotCadastral {
+  id        String   @id @default(cuid())
+  number    String   // Кадастровый номер
+  plot      Plot     @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plotId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([plotId])
+}
+
+model PlotCommunication {
+  id          String   @id @default(cuid())
+  name        String   // Название коммуникации
+  type        String   // Тип коммуникации
+  description String   // Описание
+  plot        Plot     @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plotId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([plotId])
+}
+
+model PlotFeature {
+  id          String   @id @default(cuid())
+  name        String   // Название особенности
+  title       String   // Заголовок
+  description String   // Описание
+  plot        Plot     @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plotId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([plotId])
+}
+
+model Quiz {
+  id          String        @id @default(cuid())
+  title       String        // Название квиза
+  description String        // Описание квиза
+  isActive    Boolean       @default(true) // Активен ли квиз
+  questions   QuizQuestion[] // Связь с вопросами
+  results     QuizResult[]   // Связь с результатами
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  applications Application[]
+}
+
+model QuizQuestion {
+  id          String       @id @default(cuid())
+  title       String       // Текст вопроса
+  description String?      // Дополнительное описание вопроса
+  imageUrl    String?      // URL изображения (если есть)
+  order       Int         // Порядок вопроса
+  type        QuestionType // Тип вопроса
+  isRequired  Boolean      @default(true) // Обязательный ли вопрос
+  answers     QuizAnswer[] // Связь с вариантами ответов
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([quizId])
+  @@index([order])
+}
+
+model QuizAnswer {
+  id          String       @id @default(cuid())
+  text        String       // Текст ответа
+  imageUrl    String?      // URL изображения (если есть)
+  order       Int         // Порядок ответа
+  question    QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId  String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([questionId])
+  @@index([order])
+}
+
+model QuizResult {
+  id          String       @id @default(cuid())
+  name        String?      // Имя пользователя
+  email       String?      // Email пользователя
+  phone       String?      // Телефон пользователя
+  answers     String       // JSON с ответами пользователя
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId      String
+  createdAt   DateTime     @default(now())
+
+  @@index([quizId])
+}
+
+enum QuestionType {
+  SINGLE      // Один вариант ответа
+  MULTIPLE    // Множественный выбор
+  TEXT        // Текстовый ответ
+  PHONE       // Телефон
+  EMAIL       // Email
+}
+
+// Модели для заявок
+enum ApplicationType {
+  QUIZ
+  PLOT
+  CONTACT
+}
+
+model Application {
+  id          String      @id @default(cuid())
+  type        ApplicationType
+  name        String
+  email       String
+  phone       String
+  message     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  status      String      @default("NEW") // NEW, IN_PROGRESS, COMPLETED, REJECTED
+  
+  // Связи с другими моделями
+  plot        Plot?       @relation(fields: [plotId], references: [id])
+  plotId      String?
+  quiz        Quiz?       @relation(fields: [quizId], references: [id])
+  quizId      String?
+  quizAnswers Json?      // Хранение ответов на вопросы квиза
+  
+  // Комментарии к заявке
+  comments    Comment[]
+}
+
+model Comment {
+  id            String      @id @default(cuid())
+  text          String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Связь с заявкой
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+  
+  // Связь с пользователем, оставившим комментарий
+  author        User        @relation(fields: [authorId], references: [id])
+  authorId      String
+}
+
+model PageVisit {
+  id          String    @id @default(cuid())
+  path        String    // URL страницы
+  userAgent   String?   // User-Agent браузера
+  ip          String?   // IP адрес посетителя
+  referer     String?   // Откуда пришел посетитель
+  createdAt   DateTime  @default(now())
+}
