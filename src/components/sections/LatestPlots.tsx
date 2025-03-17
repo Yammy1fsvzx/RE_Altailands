@@ -47,11 +47,11 @@ export default function LatestPlots() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
-              Новые участки
+              Свежие предложения
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            {/* <p className="text-sm sm:text-base text-gray-600">
               Посмотрите наши новейшие предложения
-            </p>
+            </p> */}
           </div>
           <Link 
             href="/catalog"

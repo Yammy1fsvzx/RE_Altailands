@@ -112,7 +112,7 @@ export default function PrivacyPage() {
                 )}
                 <li>Через форму обратной связи на сайте</li>
                 {contactInfo?.socialMedia?.whatsapp && (
-                  <li>WhatsApp: <a href={`https://wa.me/7${contactInfo.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark transition-colors">{formatPhoneNumber('7' + contactInfo.socialMedia.whatsapp)}</a></li>
+                  <li>WhatsApp: <a href={`https://wa.me/${contactInfo.socialMedia.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark transition-colors">{formatPhoneNumber(contactInfo.socialMedia.whatsapp)}</a></li>
                 )}
                 {contactInfo?.socialMedia?.telegram && (
                   <li>Telegram: <a href={`https://t.me/${contactInfo.socialMedia.telegram}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark transition-colors">@{contactInfo.socialMedia.telegram}</a></li>

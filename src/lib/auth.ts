@@ -1,20 +1,32 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import { Role } from '@prisma/client'
-import { options } from '@/app/api/auth/[...nextauth]/options'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
-export async function requireAdmin() {
-  const session = await getServerSession(options)
+export async function requireAuth() {
+  const session = await getServerSession(authOptions)
   
-  if (!session?.user) {
+  if (!session) {
     redirect('/auth/signin')
   }
   
+  return session
+}
+
+export async function requireAdmin() {
+  const session = await getServerSession(authOptions)
   
-  // @ts-ignore - мы знаем, что role существует в нашем приложении
-  if (session.user.role !== Role.ADMIN) {
+  if (!session) {
+    redirect('/auth/signin')
+  }
+  
+  if (session.user?.role !== 'ADMIN') {
     redirect('/')
   }
   
   return session
+}
+
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions)
+  return session?.user
 } 

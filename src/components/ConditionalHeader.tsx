@@ -6,8 +6,9 @@ import Header from './Header'
 export default function ConditionalHeader() {
   const pathname = usePathname()
   const isAdminRoute = pathname?.startsWith('/admin')
+  const isAuthRoute = pathname?.startsWith('/auth')
 
-  if (isAdminRoute) {
+  if (isAdminRoute || isAuthRoute) {
     return null
   }
 

@@ -120,6 +120,7 @@ export default async function NewPlotPage() {
         await prisma.plotDocument.create({
           data: {
             name: file.name,
+            title: file.name.replace(/\.[^/.]+$/, ''),
             url: `/uploads/documents/${fileName}`,
             plotId: plot.id
           }

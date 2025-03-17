@@ -1,16 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000'],
+      allowedOrigins: ['localhost:3000', 'altailands.ru', 'www.altailands.ru'],
       bodySizeLimit: '10mb'
     },
   },
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXT_PUBLIC_UPLOAD_PATH: '/uploads',
+    UPLOAD_PATH: '/app/public/uploads',
   },
   images: {
-    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -20,9 +22,16 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'altailands.ru',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.altailands.ru',
+        pathname: '/**',
       },
     ],
+    unoptimized: true
   },
   typescript: {
     ignoreBuildErrors: true
