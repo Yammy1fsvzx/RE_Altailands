@@ -76,7 +76,7 @@ export default function ContactForm({ type, plotId, plotTitle }: ContactFormProp
         </h3>
         {plotTitle && (
           <div className="text-sm text-gray-600 mb-6">
-            По вопросу участка: {plotTitle}
+            По вопросу объекта: {plotTitle}
           </div>
         )}
       </div>

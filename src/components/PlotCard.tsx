@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { formatPrice } from '@/utils/formatters'
 import { MapPinIcon } from '@heroicons/react/24/outline'
+import { squareMetersToSotka, pricePerMeterToPricePerSotka, formatSotka } from '@/utils/unitConversion'
 
 interface PlotCardProps {
   plot: {
@@ -23,6 +24,10 @@ interface PlotCardProps {
 
 export default function PlotCard({ plot }: PlotCardProps) {
   const mainImage = plot.media[0]?.url || '/images/plot-placeholder.jpg'
+  // Преобразуем площадь из квадратных метров в сотки
+  const areaSotka = squareMetersToSotka(plot.area);
+  // Преобразуем цену за квадратный метр в цену за сотку
+  const pricePerSotka = pricePerMeterToPricePerSotka(plot.pricePerMeter);
   
   return (
     <Link 
@@ -48,11 +53,11 @@ export default function PlotCard({ plot }: PlotCardProps) {
               {formatPrice(plot.price)} ₽
             </div>
             <div className="text-xs sm:text-sm text-[#16a34a] font-medium">
-              {formatPrice(plot.pricePerMeter)} ₽/м²
+              {formatPrice(pricePerSotka)} ₽/сотка
             </div>
           </div>
           <div className="bg-[#16a34a] text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium">
-            {plot.area} м²
+            {formatSotka(areaSotka)} соток
           </div>
         </div>
       </div>

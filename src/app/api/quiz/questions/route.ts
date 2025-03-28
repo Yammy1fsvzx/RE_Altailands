@@ -12,7 +12,7 @@ interface QuizWithQuestions extends Quiz {
 
 export async function GET() {
   try {
-    // Получаем первый активный квиз с вопросами и ответами
+    // Получаем активный квиз с вопросами и ответами
     const quiz = await prisma.quiz.findFirst({
       where: {
         isActive: true
@@ -35,8 +35,22 @@ export async function GET() {
 
     if (!quiz) {
       return NextResponse.json(
-        { error: 'Quiz not found' },
+        { 
+          error: 'Активный квиз не найден',
+          message: 'В данный момент нет активного опроса. Пожалуйста, попробуйте позже.'
+        },
         { status: 404 }
+      )
+    }
+
+    // Проверяем, есть ли вопросы в квизе
+    if (quiz.questions.length === 0) {
+      return NextResponse.json(
+        { 
+          error: 'Структура квиза некорректна',
+          message: 'В квизе отсутствуют вопросы. Пожалуйста, сообщите администратору.'
+        },
+        { status: 400 }
       )
     }
 
@@ -65,7 +79,10 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching quiz questions:', error)
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { 
+        error: 'Внутренняя ошибка сервера',
+        message: 'Произошла ошибка при получении данных опроса. Пожалуйста, попробуйте позже.'
+      },
       { status: 500 }
     )
   }

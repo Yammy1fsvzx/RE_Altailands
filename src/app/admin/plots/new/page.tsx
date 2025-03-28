@@ -127,7 +127,8 @@ export default async function NewPlotPage() {
         })
       }
 
-      redirect('/admin/plots')
+      // Возвращаем успешный результат
+      return { success: true, id: plot.id };
     } catch (error) {
       // Перехватываем ошибку и возвращаем понятное сообщение
       if (error instanceof Error) {

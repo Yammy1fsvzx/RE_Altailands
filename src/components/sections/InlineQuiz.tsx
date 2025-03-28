@@ -70,7 +70,8 @@ export default function InlineQuiz({ onComplete }: QuizProps) {
       const response = await fetch('/api/quiz/questions')
       
       if (!response.ok) {
-        throw new Error(`Ошибка загрузки вопросов: ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.message || `Ошибка загрузки вопросов: ${response.status}`)
       }
       
       const data = await response.json()
@@ -127,8 +128,10 @@ export default function InlineQuiz({ onComplete }: QuizProps) {
         }),
       })
       
+      // Обрабатываем ошибки сервера
       if (!response.ok) {
-        throw new Error('Ошибка отправки данных')
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Ошибка отправки данных')
       }
       
       const result = await response.json()

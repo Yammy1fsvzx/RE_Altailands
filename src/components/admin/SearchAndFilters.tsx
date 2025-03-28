@@ -48,23 +48,25 @@ export default function SearchAndFilters({
   }, [search, sortBy, sortOrder, status, createQueryString, router])
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-      <div className="relative flex-1 min-w-[240px]">
+    <div className="flex flex-col lg:flex-row gap-4 w-full overflow-hidden">
+      {/* Поисковая строка */}
+      <div className="relative w-full lg:max-w-md">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Поиск по названию, кадастровому номеру..."
-          className="w-full sm:w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
         />
         <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Фильтры */}
+      <div className="flex flex-wrap gap-3 w-full lg:w-auto">
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white bg-white dark:bg-gray-800"
         >
           <option value="">Все статусы</option>
           <option value="AVAILABLE">Доступен</option>
@@ -75,7 +77,7 @@ export default function SearchAndFilters({
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white bg-white dark:bg-gray-800"
         >
           <option value="createdAt">По дате создания</option>
           <option value="price">По цене</option>
@@ -86,7 +88,7 @@ export default function SearchAndFilters({
         <select
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white bg-white dark:bg-gray-800"
         >
           <option value="desc">По убыванию</option>
           <option value="asc">По возрастанию</option>

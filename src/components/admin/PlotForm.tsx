@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plot, PlotMedia, PlotDocument, PlotCadastral, PlotCommunication, PlotFeature, PlotStatus } from '@prisma/client'
+import { Plot, PlotMedia, PlotDocument, PlotCadastral, PlotCommunication, PlotFeature } from '@prisma/client'
+import { PlotStatus } from '@/types'
 import { useRouter } from 'next/navigation'
 import PlotMediaUpload from './PlotMediaUpload'
 import PlotDescriptionForm from './PlotDescriptionForm'
@@ -35,7 +36,7 @@ type PlotFormProps = {
     communications: PlotCommunication[]
     features: PlotFeature[]
   } | null
-  onSubmit: (data: PlotFormData) => Promise<void>
+  onSubmit: (data: PlotFormData) => Promise<void | { success: boolean; id: string }>
 }
 
 type SimpleCommunication = {
@@ -324,11 +325,15 @@ export default function PlotForm({ plot, onSubmit }: PlotFormProps) {
     e.preventDefault()
     try {
       setIsSubmitting(true)
-      await onSubmit(formData)
+      const result = await onSubmit(formData)
+      
+      // Показываем уведомление об успехе
       showNotification(
         plot ? 'Участок успешно обновлен' : 'Участок успешно создан',
         'success'
       )
+      
+      // Перенаправляем на страницу списка участков
       router.push('/admin/plots')
       router.refresh()
     } catch (error) {

@@ -1,12 +1,8 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import QuizWidget from '@/components/QuizWidget'
 import ScrollAnimation from '@/components/ScrollAnimation'
-import { ArrowRightIcon } from '@heroicons/react/24/outline'
-import { PhoneIcon } from '@heroicons/react/24/outline'
 import HeroSection from '@/components/sections/HeroSection'
 import InlineQuiz from '@/components/sections/InlineQuiz'
 import LatestPlots from '@/components/sections/LatestPlots'
@@ -40,7 +36,6 @@ export default function HomePage() {
         <HeroSection />
 
         <section className="py-10 md:py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/images/altai-pattern.svg')] opacity-5"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-gray-100"></div>
           <div className="max-w-7xl mx-auto px-4 relative">
             <ScrollAnimation>

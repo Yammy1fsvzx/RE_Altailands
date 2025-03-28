@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
 import { useNotification } from '@/contexts/NotificationContext'
 
 type Question = {
@@ -54,7 +54,11 @@ export default function QuizForm({ initialData }: QuizFormProps) {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/quizzes${formData.id ? `/${formData.id}` : ''}`, {
+      const url = formData.id 
+        ? `/api/admin/quizzes?id=${formData.id}` 
+        : '/api/admin/quizzes'
+        
+      const response = await fetch(url, {
         method: formData.id ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +91,7 @@ export default function QuizForm({ initialData }: QuizFormProps) {
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/admin/quizzes/${formData.id}`, {
+      const response = await fetch(`/api/admin/quizzes?id=${formData.id}`, {
         method: 'DELETE',
       })
 
@@ -162,43 +166,7 @@ export default function QuizForm({ initialData }: QuizFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <button
-          type="button"
-          onClick={() => router.push('/admin/quizzes')}
-          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white 
-                   font-medium transition duration-200"
-        >
-          ← Назад к списку
-        </button>
-        <div className="flex gap-4">
-          {formData.id && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 
-                       text-white font-medium text-sm transition duration-200
-                       focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-                       disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isDeleting ? 'Удаление...' : 'Удалить'}
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 
-                     text-white font-medium text-sm transition duration-200
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Сохранение...' : 'Сохранить'}
-          </button>
-        </div>
-      </div>
-
+    <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm pb-24">
       <div className="space-y-8">
         {/* Основная информация */}
         <div>
@@ -241,26 +209,38 @@ export default function QuizForm({ initialData }: QuizFormProps) {
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 
-                              peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
-                              peer dark:bg-gray-700 peer-checked:after:translate-x-full 
-                              peer-checked:after:border-white after:content-[''] after:absolute 
-                              after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 
-                              after:border after:rounded-full after:h-5 after:w-5 after:transition-all 
-                              dark:border-gray-600 peer-checked:bg-blue-600">
+            <div>
+              <div className="flex items-center mb-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 
+                                peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
+                                peer dark:bg-gray-700 peer-checked:after:translate-x-full 
+                                peer-checked:after:border-white after:content-[''] after:absolute 
+                                after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 
+                                after:border after:rounded-full after:h-5 after:w-5 after:transition-all 
+                                dark:border-gray-600 peer-checked:bg-blue-600">
+                  </div>
+                  <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Активен
+                  </span>
+                </label>
+              </div>
+              
+              <div className="flex items-start mt-2 p-4 border border-blue-100 bg-blue-50 dark:border-blue-900 dark:bg-blue-900/30 rounded-lg">
+                <InformationCircleIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
+                <div className="text-sm text-blue-700 dark:text-blue-300">
+                  <p>В системе может быть только один активный квиз. Если вы активируете этот квиз, ранее активный квиз будет автоматически деактивирован.</p>
+                  {!initialData?.isActive && initialData?.id && (
+                    <p className="mt-1 font-medium">Текущий квиз неактивен. Активируйте его, чтобы показывать этот опрос посетителям сайта.</p>
+                  )}
                 </div>
-                <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Активен
-                </span>
-              </label>
+              </div>
             </div>
           </div>
         </div>
@@ -399,6 +379,42 @@ export default function QuizForm({ initialData }: QuizFormProps) {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Фиксированная панель с кнопками навигации */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 z-10 flex justify-between items-center shadow-lg">
+        <button
+          type="button"
+          onClick={() => router.push('/admin/quizzes')}
+          className="px-6 py-2.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-medium text-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          ← Назад к списку
+        </button>
+        <div className="flex gap-4">
+          {formData.id && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 
+                       text-white font-medium text-sm transition duration-200
+                       focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isDeleting ? 'Удаление...' : 'Удалить'}
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 
+                     text-white font-medium text-sm transition duration-200
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Сохранение...' : 'Сохранить'}
+          </button>
         </div>
       </div>
     </form>

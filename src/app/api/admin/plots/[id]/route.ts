@@ -56,11 +56,55 @@ export async function PUT(
     }
 
     // Проверяем обязательные поля
-    if (!plotData.title || !plotData.slug) {
+    const requiredFields = ['title', 'slug', 'area', 'price'];
+    for (const field of requiredFields) {
+      if (!plotData[field as keyof PlotUpdateData] && plotData[field as keyof PlotUpdateData] !== 0) {
+        return NextResponse.json(
+          { 
+            error: `Поле ${field} обязательно для заполнения`,
+            field
+          },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Валидация числовых полей
+    const numericFields = [
+      { name: 'area', min: 0, message: 'Площадь участка не может быть отрицательной' },
+      { name: 'price', min: 0, message: 'Цена участка не может быть отрицательной' },
+      { name: 'pricePerMeter', min: 0, message: 'Цена за сотку не может быть отрицательной' }
+    ];
+
+    for (const field of numericFields) {
+      const value = data[field.name];
+      if (value !== undefined && value < field.min) {
+        return NextResponse.json(
+          { 
+            error: field.message,
+            field: field.name
+          },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Проверяем изменения в данных перед сохранением
+    const existingPlot = await prisma.plot.findUnique({
+      where: { id }
+    });
+    
+    if (!existingPlot) {
       return NextResponse.json(
-        { error: 'Название и URL участка обязательны' },
-        { status: 400 }
+        { error: 'Участок не найден' },
+        { status: 404 }
       )
+    }
+
+    // Проверяем, изменилась ли цена и логируем это
+    if (existingPlot.price !== plotData.price) {
+      console.log(`Цена участка ${existingPlot.title} изменена с ${existingPlot.price} на ${plotData.price}`);
+      // Здесь можно добавить дополнительную логику, например, логирование в БД
     }
 
     // Проверяем уникальность slug только если он указан
@@ -105,12 +149,15 @@ export async function PUT(
     }
 
     // Обновляем порядок существующих файлов
-    for (const item of mediaOrder) {
+    for (const [index, item] of mediaOrder.entries()) {
       if (item.id) {
         await prisma.plotMedia.update({
           where: { id: item.id },
-          data: { order: item.order }
+          data: { order: index }  // Используем индекс массива для порядка
         })
+        
+        // Дополнительно логируем обновление порядка для отладки
+        console.log(`Обновляем медиафайл ${item.id}, новый порядок: ${index}`)
       }
     }
 

@@ -11,7 +11,7 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc'
       },
-      take: 2,
+      take: 3,
       include: {
         media: {
           take: 1,

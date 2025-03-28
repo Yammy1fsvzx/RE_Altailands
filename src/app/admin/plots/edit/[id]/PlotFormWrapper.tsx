@@ -29,9 +29,12 @@ export default function PlotFormWrapper({ plot }: PlotFormWrapperProps) {
       form.append('data', JSON.stringify({
         ...formData,
         plotId: plot.id,
-        media: formData.media.map(file => {
+        media: formData.media.map((file, index) => {
           if ('id' in file) {
-            return file
+            return {
+              ...file,
+              order: index  // Явно добавляем порядок для каждого файла
+            }
           }
           return null
         }).filter(Boolean),
@@ -57,7 +60,7 @@ export default function PlotFormWrapper({ plot }: PlotFormWrapperProps) {
         }
       })
 
-      const response = await fetch('/api/plots/' + plot.id, {
+      const response = await fetch('/api/admin/plots/' + plot.id, {
         method: 'PUT',
         body: form
       })
@@ -66,11 +69,14 @@ export default function PlotFormWrapper({ plot }: PlotFormWrapperProps) {
         throw new Error('Ошибка при обновлении участка')
       }
 
-      router.push('/admin/plots')
-      router.refresh()
+      // Возвращаем успешный результат
+      return { success: true, id: plot.id };
     } catch (error) {
       console.error('Ошибка:', error)
-      alert('Произошла ошибка при сохранении участка')
+      if (error instanceof Error) {
+        throw new Error(error.message)
+      }
+      throw new Error('Произошла ошибка при сохранении участка')
     }
   }
 

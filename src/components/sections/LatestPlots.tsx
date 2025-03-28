@@ -84,7 +84,7 @@ export default function LatestPlots() {
 function PlotsSkeleton() {
   return (
     <>
-      {[1, 2].map((i) => (
+      {[1, 2, 3].map((i) => (
         <div 
           key={i}
           className="bg-white rounded-xl sm:rounded-2xl overflow-hidden animate-pulse"

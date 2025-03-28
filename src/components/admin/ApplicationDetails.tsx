@@ -31,11 +31,22 @@ interface ExtendedComment extends Comment {
   author: User
 }
 
-interface ExtendedApplication extends Application {
+export interface ExtendedApplication {
+  id: string
+  createdAt: string | Date
+  updatedAt?: string | Date
+  status: string
+  type: string
+  name: string
+  email: string
+  phone: string
+  message?: string | null
+  plotId?: string | null
+  quizId?: string | null
   quiz?: ExtendedQuiz
   plot?: ExtendedPlot
   comments: ExtendedComment[]
-  quizAnswers: Record<string, string | string[]>
+  quizAnswers?: Record<string, string | string[]> | any
 }
 
 interface ApplicationDetailsProps {
@@ -101,7 +112,7 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
   }
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-20">
       {/* Основная информация */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
         <h2 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-3 md:mb-4">
@@ -175,7 +186,13 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
                           const answerObj = question.answers.find((qa: { id: string; text: string }) => qa.id === a)
                           return answerObj ? answerObj.text : a
                         }).join(', ')
-                      : answer}
+                      : (
+                          (() => {
+                            const answerObj = question.answers.find((qa: { id: string; text: string }) => qa.id === answer)
+                            return answerObj ? answerObj.text : answer
+                          })()
+                        )
+                    }
                   </p>
                 </div>
               )
@@ -256,6 +273,25 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
               Нет комментариев
             </p>
           )}
+        </div>
+      </div>
+      
+      {/* Фиксированная панель с кнопками навигации */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 z-10 flex justify-between items-center shadow-lg">
+        <Link
+          href="/admin/applications"
+          className="px-6 py-2.5 rounded-lg bg-gray-500 hover:bg-gray-600 text-white font-medium text-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          ← Назад к списку
+        </Link>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => router.refresh()}
+            className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Обновить
+          </button>
         </div>
       </div>
     </div>

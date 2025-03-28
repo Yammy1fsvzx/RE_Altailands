@@ -21,6 +21,45 @@ export async function POST(request: Request) {
     const formData = await request.formData()
     const data = JSON.parse(formData.get('data') as string)
 
+    // Проверяем обязательные поля
+    const requiredFields = ['title', 'slug', 'area', 'price'];
+    for (const field of requiredFields) {
+      if (!data[field] && data[field] !== 0) {
+        return new NextResponse(
+          JSON.stringify({ 
+            error: `Поле ${field} обязательно для заполнения`,
+            field
+          }), 
+          { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      }
+    }
+
+    // Валидация числовых полей
+    const numericFields = [
+      { name: 'area', min: 0, message: 'Площадь участка не может быть отрицательной' },
+      { name: 'price', min: 0, message: 'Цена участка не может быть отрицательной' },
+      { name: 'pricePerMeter', min: 0, message: 'Цена за сотку не может быть отрицательной' }
+    ];
+
+    for (const field of numericFields) {
+      if (data[field.name] < field.min) {
+        return new NextResponse(
+          JSON.stringify({ 
+            error: field.message,
+            field: field.name
+          }), 
+          { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      }
+    }
+
     // Проверяем уникальность slug
     const existingPlot = await prisma.plot.findUnique({
       where: { slug: data.slug }
